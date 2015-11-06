@@ -1,10 +1,10 @@
-*Minecraft Alerts*
-**Features**
+# Minecraft Alerts
+## Features
 - Able to alert if a server goes down.
 - Able to return simple info like TPS, mem and even mem/cpu usage on the dedi.
 - Able to setup scheduled alerts.
 
-**Commands**
+## Commands
 - cmd check (server) - Check if server is added.
 - cmd add (server) (ip) (port) - Add a new server.
 - cmd del (server) - Remove a server.
@@ -20,7 +20,7 @@
 - cmd get back disk (server) - Returns the disk usage of the whole dedi/vps.
 - cmd get back uptime (server) - Returns the uptime of the dedi/vps.
 
-**Notes**
+## Notes
 - Some of this commands will require plugins to be installed on the server.
 - This plugin requires a extra software to be installed on the dedi/vps that will start a TCP server.
 - Current plans only include a extra software, I might make a bukkit plugin to get just front info.

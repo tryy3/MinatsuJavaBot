@@ -1,9 +1,9 @@
-*Simple Commands*
-**Features**
+# Simple Commands
+## Features
 - Ability to add perms on runtime
 - Seperate CommandHandler *possibly*
 
-**Commands**
+## Commands
 - cmd add (name) (message) - Add a new reply
 - cmd del (name) - Remove a reply
 - cmd check (name) - Check if reply exists

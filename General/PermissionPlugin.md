@@ -1,5 +1,5 @@
-*Permission System*
-**Features**
+# Permission System
+## Features
 - API
 - Groups
 - Permissions
@@ -7,8 +7,8 @@
 - Negation
 - Regex (possibly)
 
-**API**
-***Group***
+## API
+### Group
 - addGroupPermission() - Add a perm node to a specific group.
 - delGroupPermission() - Delete a perm node from a specific group.
 - hasGroupPermission() - Check if group have a specific perm node.
@@ -17,7 +17,8 @@
 - createGroup() - Create a new group.
 - deleteGroup() - Delete a existing group.
 - isGroup() - Check if a group exists.
-***Player***
+
+### Player
 - addPlayerPermission() - Add a perm node to a specific player.
 - delPlayerPermission() - Delete a perm node from a specific player.
 - hasPlayerPermission() - Check if player has a specific perm (will also check from group)
@@ -26,18 +27,20 @@
 - addToGroup() - Add a player to a specific group.
 - removeFromGroup() - Remove a player from a specific group.
 - hasGroup() - Check if the player is in a group.
-***Misc***
+
+### Misc
 - getGroups() - Get all groups.
 
-**Commands**
-***Group***
+## Commands
+### Group
 - cmd (group) add (perm)
 - cmd (group) del (perm)
 - cmd (group) has (perm)
 - cmd (group) players
 - cmd (group) create
 - cmd (group) delete
-***Player***
+
+### Player
 - cmd (player) add (perm)
 - cmd (player) del (perm)
 - cmd (player) has (perm)
@@ -45,5 +48,6 @@
 - cmd (player) group add (group)
 - cmd (player) group del (group)
 - cmd (player) group has (group)
-***Misc***
+
+### Misc
 - getGroups()
