@@ -5,6 +5,10 @@ package us.tryy3.java.minatsuskype;
  */
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Yello");
+        try {
+            new Bot();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
