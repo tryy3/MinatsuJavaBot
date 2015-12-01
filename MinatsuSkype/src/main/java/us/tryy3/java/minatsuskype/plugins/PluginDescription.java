@@ -4,11 +4,12 @@ package us.tryy3.java.minatsuskype.plugins;
  * Created by dennis.planting on 11/10/2015.
  */
 public class PluginDescription {
-    private String name;
-    private String version;
-    private String description;
-    private String authors;
-    private String website;
+    private String name = null;
+    private String version = null;
+    private String description = null;
+    private String authors = null;
+    private String website = null;
+    private String prefix = null;
 
     public PluginDescription(String name, String version) {
         this.setName(name);
@@ -32,6 +33,14 @@ public class PluginDescription {
         this.setAuthors(authors);
         this.setWebsite(website);
     }
+    public PluginDescription(String name, String version, String description, String authors, String website, String prefix) {
+        this.setName(name);
+        this.setVersion(version);
+        this.setDescription(description);
+        this.setAuthors(authors);
+        this.setWebsite(website);
+        this.setPrefix(prefix);
+    }
 
     public String getAuthors() {
         return authors;
@@ -53,6 +62,10 @@ public class PluginDescription {
         return website;
     }
 
+    public String getPrefix() {
+        return this.prefix;
+    }
+
     public void setVersion(String version) {
         this.version = version;
     }
@@ -71,6 +84,10 @@ public class PluginDescription {
 
     public void setWebsite(String website) {
         this.website = website;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
     }
 
     public String toString() {

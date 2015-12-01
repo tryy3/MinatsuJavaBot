@@ -15,16 +15,15 @@ public class Main extends Plugin {
     @Override
     public void init(Bot bot, File pluginDir) {
         PluginDescription desc = new PluginDescription("TestPlugin", "0.0.1");
-        System.out.println(desc);
         super.init(bot, pluginDir, desc);
     }
 
     @Override
     public void onStart() {
-        System.out.println("PLUGIN LOADED WOOOT");
-        getBot().getEventManager().registerEvents(new commandListener());
         Map js = loadConfig(getPluginFolder() + "/config.json");
-        System.out.println(js);
+        System.out.println(getLogger());
+        getLogger().info("Test Plugin has now been loaded");
+        getLogger().info("meow");
         js.put("Name", "tryy3");
         saveConfig(getPluginFolder() + "/config.json", js);
     }

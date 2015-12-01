@@ -8,8 +8,12 @@ import java.util.Map;
 /**
  * Created by dennis.planting on 11/6/2015.
  */
-public abstract class Event {
+public class Event {
     private HashMap<Method, Class<?>> registeredEvents;
+
+    public Event() {
+
+    }
 
     public void registerEvents(Listener listener) {
         Class<?> clazz = listener.getClass();

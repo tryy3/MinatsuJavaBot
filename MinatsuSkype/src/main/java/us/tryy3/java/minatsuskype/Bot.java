@@ -1,8 +1,11 @@
 package us.tryy3.java.minatsuskype;
 
 import com.google.gson.JsonArray;
+import us.tryy3.java.minatsuskype.command.Command;
+import us.tryy3.java.minatsuskype.command.CommandManager;
+import us.tryy3.java.minatsuskype.events.Event;
 import us.tryy3.java.minatsuskype.events.onChatEvent;
-import us.tryy3.java.minatsuskype.manager.*;
+import us.tryy3.java.minatsuskype.logger.PluginLogger;
 import us.tryy3.java.minatsuskype.plugins.Plugin;
 import us.tryy3.java.minatsuskype.plugins.PluginDescription;
 
@@ -17,36 +20,32 @@ import java.util.*;
  * Created by dennis.planting on 11/10/2015.
  */
 public class Bot {
-    private ConfigManager configManager;
-    private DatabaseManager databaseManager;
-    private EventManager eventManager;
-    private PluginManager pluginManager;
+    private Event event;
     private CommandManager commandManager;
     private Map<String, Plugin> plugins;
     private TCPClient tcpClient;
+    private PluginLogger logger = new PluginLogger(null);
+    private String version = "0.0.1";
 
     public Bot() throws MalformedURLException {
+        logger.info("Initalizing Minatsu Version " + version);
         this.plugins = new HashMap<>();
         this.tcpClient = new TCPClient("127.0.0.1", 1337, this);
-
-        this.configManager = new ConfigManager();
-        this.databaseManager = new DatabaseManager();
-        this.eventManager = new EventManager();
-        this.pluginManager = new PluginManager();
+        this.event = new Event();
         this.commandManager = new CommandManager();
 
         File pluginDir = new File("plugins");
 
         if (!pluginDir.exists()) {
             pluginDir.mkdirs();
-            System.out.println("Creating plugins folder.");
+            logger.fine("Creating plugins folder.");
         }
 
         if (pluginDir.exists() && pluginDir.isFile()) {
             throw new Error("Plugins folder is a file.");
         }
 
-        System.out.println("Folder found.");
+        logger.fine("Folder found.");
 
         File[] fileList = pluginDir.listFiles(new FileFilter() {
             public boolean accept(File path) {
@@ -54,7 +53,7 @@ public class Bot {
             }
         });
 
-        System.out.println(fileList.length + " plugins found.");
+        logger.info(fileList.length + " plugin(s) found.");
 
         URL[] urls = new URL[fileList.length];
 
@@ -66,17 +65,14 @@ public class Bot {
 
         ServiceLoader<Plugin> pluginLoader = ServiceLoader.load(Plugin.class, urlClassLoader);
 
-        System.out.println("Plugins: " + urlClassLoader.toString());
-
         for (Plugin plugin : pluginLoader) {
             plugin.init(this, pluginDir);
             PluginDescription desc = plugin.getDescription();
-            System.out.println("Plugin: " + desc);
             if (this.plugins.containsKey(desc.getName())) {
-                System.out.println("The plugin " + desc.getName() + " already exists.");
+                logger.severe("The plugin " + desc.getName() + " already exists.");
             } else {
                 this.plugins.put(desc.getName(), plugin);
-                System.out.println(desc.toString());
+                logger.info("Enabling plugin %s version %s", desc.getName(), desc.getVersion());
                 plugin.onStart();
             }
         }
@@ -86,12 +82,12 @@ public class Bot {
         switch (array.get(0).getAsString()) {
             case "onMessageEvent": {
                 if (array.size() <= 1) {
-                    System.out.println("Message event called, but no args.");
+                    logger.severe("TCPClient sent message event but no args was sent.");
                     return;
                 }
                 JsonArray ja = array.get(1).getAsJsonArray();
                 if (ja.size() < 3) {
-                    System.out.println("Not enough arguments was sent.");
+                    logger.severe("TCPClient sent message event but not enough args was sent.");
                     return;
                 }
                 String msg = ja.get(2).getAsString();
@@ -105,23 +101,33 @@ public class Bot {
                     String[] args = splitmsg.length > 1 ? Arrays.copyOfRange(splitmsg, 1, splitmsg.length) : null;
 
                     Boolean knownCommand = false;
-                    System.out.println("knownCommand: " + knownCommand);
 
-                    System.out.println("Plugins: " + getPlugins().size());
                     for (Plugin plugin : getPlugins().values()) {
                         if (plugin.onCommand(from, id, command, args)) {
-                            System.out.println("Return was true");
                             knownCommand = true;
                         }
-                        System.out.println("Return was false");
                     }
-                    System.out.println("knownCommand: " + knownCommand);
+
+                    for (Command cmd : commandManager.getCommands()) {
+                        if (cmd.getName().equals(command)) {
+                            knownCommand = cmd.onCommand(from, id, cmd, command, args);
+                            break;
+                        } else {
+                            for (String s : cmd.getAliases()) {
+                                if (s.equals(command)) {
+                                    knownCommand = cmd.onCommand(from, id, cmd, command, args);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
                     if (!knownCommand) {
                         getTcpClient().writeMessage(id, "Unknown command, please check the help page.");
                     }
                     break;
                 }
-                getEventManager().callEvents(new onChatEvent(msg, from, id));
+                getEvent().callEvents(new onChatEvent(msg, from, id));
                 break;
             }
         }
@@ -131,20 +137,8 @@ public class Bot {
         return commandManager;
     }
 
-    public ConfigManager getConfigManager() {
-        return configManager;
-    }
-
-    public EventManager getEventManager() {
-        return eventManager;
-    }
-
-    public DatabaseManager getDatabaseManager() {
-        return databaseManager;
-    }
-
-    public PluginManager getPluginManager() {
-        return pluginManager;
+    public Event getEvent() {
+        return event;
     }
 
     public Map<String, Plugin> getPlugins() {

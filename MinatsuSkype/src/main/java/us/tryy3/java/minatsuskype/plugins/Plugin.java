@@ -3,6 +3,7 @@ package us.tryy3.java.minatsuskype.plugins;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import us.tryy3.java.minatsuskype.Bot;
+import us.tryy3.java.minatsuskype.logger.PluginLogger;
 
 import java.io.*;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ public abstract class Plugin {
     private File file;
     private File pluginFolder;
     private Bot bot;
+    private PluginLogger logger;
 
     public File getFile() {
         return file;
@@ -28,6 +30,10 @@ public abstract class Plugin {
 
     public PluginDescription getDescription() {
         return description;
+    }
+
+    public PluginLogger getLogger() {
+        return logger;
     }
 
     public boolean isEnabled() {
@@ -66,8 +72,10 @@ public abstract class Plugin {
     }
 
     public void onStart() {
+        getLogger().info("Enabling %s %s", getDescription().getName(), getDescription().getVersion());
     }
     public void onStop() {
+        getLogger().info("Disabling %s %s", getDescription().getName(), getDescription().getVersion());
     }
 
     /* TODO: Come up with a better system for this. */
@@ -87,6 +95,8 @@ public abstract class Plugin {
         this.bot = bot;
         this.pluginFolder = new File(datafolder + "/" + description.getName());
         this.description = description;
+        this.logger = new PluginLogger(this);
+        getLogger().info("Loading %s %s", getDescription().getName(), getDescription().getVersion());
     }
 
 
@@ -159,19 +169,19 @@ public abstract class Plugin {
 
     public boolean checkFile(File file) throws IOException {
         if (file.exists() && !file.isFile()) {
-            System.out.println("The config file is not a file. " + file.getPath());
+            getLogger().severe("The config file is not a file. " + file.getPath());
             return false;
         }
         File folder = file.getParentFile();
         if (!folder.exists()) {
-            System.out.println("Can't find file, creating folders.");
+            getLogger().fine("Can't find file, creating folders.");
             boolean folderBol = folder.mkdirs();
-            System.out.println((folderBol ? "Folder created." : "Folder failed to create."));
+            getLogger().fine((folderBol ? "Folder created." : "Folder failed to create."));
         }
         if (!file.exists()) {
-            System.out.println("Can't find file, creating file.");
+            getLogger().fine("Can't find file, creating file.");
             boolean fileBol = file.createNewFile();
-            System.out.println((fileBol ? "File created." : "File failed to create."));
+            getLogger().fine((fileBol ? "File created." : "File failed to create."));
         }
         return true;
     }
