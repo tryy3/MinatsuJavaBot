@@ -44,6 +44,8 @@ public class Main extends Plugin {
         }
         this.permissionsApi = new PermissionsApi(this);
         this.messages = new Messages();
+
+        //Register new sub commands;
     }
 
     @Override
@@ -532,5 +534,9 @@ public class Main extends Plugin {
 
     public PermissionsApi getPermissionsApi() {
         return permissionsApi;
+    }
+
+    public Messages getMessages() {
+        return messages;
     }
 }
