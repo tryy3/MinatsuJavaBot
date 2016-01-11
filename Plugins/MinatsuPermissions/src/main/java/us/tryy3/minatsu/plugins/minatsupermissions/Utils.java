@@ -1,4 +1,4 @@
-package us.tryy3.minatsuskype.plugins.minatsupermissions;
+package us.tryy3.minatsu.plugins.minatsupermissions;
 
 import java.util.List;
 

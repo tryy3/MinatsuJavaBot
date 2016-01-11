@@ -1,7 +1,7 @@
-package us.tryy3.minatsuskype.plugins.minatsupermissions;
+package us.tryy3.minatsu.plugins.minatsupermissions;
 
-import us.tryy3.minatsuskype.plugins.minatsupermissions.exceptions.MultipleDefaultGroupsException;
-import us.tryy3.minatsuskype.plugins.minatsupermissions.exceptions.NoDefaultGroupException;
+import us.tryy3.minatsu.plugins.minatsupermissions.exceptions.MultipleDefaultGroupsException;
+import us.tryy3.minatsu.plugins.minatsupermissions.exceptions.NoDefaultGroupException;
 
 import java.util.ArrayList;
 import java.util.HashMap;

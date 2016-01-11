@@ -105,11 +105,11 @@ public class TCPServer {
             }
         }
 
-        protected void sendMessage(String message) {
+        public void sendMessage(String message) {
             out.println(message);
         }
 
-        protected void sendMessage(String id, String message) {
+        public void sendMessage(String id, String message) {
             JsonArray writeArgs = new JsonArray();
             JsonArray msgArgs = new JsonArray();
 

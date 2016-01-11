@@ -1,12 +1,13 @@
-package us.tryy3.minatsuskype.plugins.testplugin;
+package us.tryy3.minatsu.plugins.testplugin;
 
-import us.tryy3.java.minatsuskype.Bot;
-import us.tryy3.java.minatsuskype.plugins.Plugin;
-import us.tryy3.java.minatsuskype.plugins.PluginDescription;
+import us.tryy3.java.minatsu.Bot;
+import us.tryy3.java.minatsu.TCPServer.Connection;
+import us.tryy3.java.minatsu.plugins.Plugin;
+import us.tryy3.java.minatsu.plugins.PluginDescription;
+import us.tryy3.java.minatsu.plugins.PluginDescription.DescriptionBuilder;
 import us.tryy3.minatsuskype.plugins.minatsupermissions.PermissionsApi;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -17,13 +18,12 @@ public class Main extends Plugin {
 
     @Override
     public void init(Bot bot, File pluginDir) {
-        PluginDescription desc = new PluginDescription("TestPlugin", "0.0.1");
+        PluginDescription desc = new DescriptionBuilder("TestPlugin", "0.0.1").build();
         super.init(bot, pluginDir, desc);
     }
 
     @Override
     public void onStart() {
-        if (getBot().get)
         Map js = loadConfig(getPluginFolder() + "/config.json");
         System.out.println(getLogger());
         getLogger().info("Test Plugin has now been loaded");
@@ -33,8 +33,7 @@ public class Main extends Plugin {
     }
 
     @Override
-    public boolean onCommand(String from, String id, String cmd, String[] args) {
-        if ()
-        return super.onCommand(from, id, cmd, args);
+    public boolean onCommand(Connection connection, String from, String id, String cmd, String[] args) {
+        return super.onCommand(connection, from, id, cmd, args);
     }
 }

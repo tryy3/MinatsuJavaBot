@@ -4,20 +4,20 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>us.tryy3.minatsuskype.plugins</groupId>
+    <groupId>us.tryy3.minatsu.plugins</groupId>
     <artifactId>TestPlugin</artifactId>
     <version>0.0.1</version>
 
     <dependencies>
         <dependency>
             <groupId>us.tryy3.java</groupId>
-            <artifactId>MinatsuSkype</artifactId>
+            <artifactId>Minatsu</artifactId>
             <version>0.0.1</version>
             <scope>system</scope>
-            <systemPath>${pom.basedir}/../../MinatsuSkype/target/MintasuSkype-0.0.1-jar-with-dependencies.jar</systemPath>
+            <systemPath>${pom.basedir}/../../Minatsu/target/Minatsu-0.0.1-jar-with-dependencies.jar</systemPath>
         </dependency>
         <dependency>
-            <groupId>us.tryy3.minatsuskype.plugins</groupId>
+            <groupId>us.tryy3.minatsu.plugins</groupId>
             <artifactId>MinatsuPermissions</artifactId>
             <version>0.0.1</version>
             <scope>system</scope>

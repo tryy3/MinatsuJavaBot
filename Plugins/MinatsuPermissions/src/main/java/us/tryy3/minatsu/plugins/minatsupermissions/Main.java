@@ -1,10 +1,11 @@
-package us.tryy3.minatsuskype.plugins.minatsupermissions;
+package us.tryy3.minatsu.plugins.minatsupermissions;
 
-import us.tryy3.java.minatsuskype.Bot;
-import us.tryy3.java.minatsuskype.plugins.Plugin;
-import us.tryy3.java.minatsuskype.plugins.PluginDescription;
-import us.tryy3.minatsuskype.plugins.minatsupermissions.exceptions.MultipleDefaultGroupsException;
-import us.tryy3.minatsuskype.plugins.minatsupermissions.exceptions.NoDefaultGroupException;
+import us.tryy3.java.minatsu.Bot;
+import us.tryy3.java.minatsu.plugins.Plugin;
+import us.tryy3.java.minatsu.plugins.PluginDescription;
+import us.tryy3.java.minatsu.TCPServer.Connection;
+import us.tryy3.minatsu.plugins.minatsupermissions.exceptions.MultipleDefaultGroupsException;
+import us.tryy3.minatsu.plugins.minatsupermissions.exceptions.NoDefaultGroupException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -160,12 +161,12 @@ public class Main extends Plugin {
         TODO: Comment this whole plugin :)
      */
     @Override
-    public boolean onCommand(String from, String id, String cmd, String[] args) {
+    public boolean onCommand(Connection connection, String from, String id, String cmd, String[] args) {
         System.out.println("Message found...");
         if (cmd.toLowerCase().equals("mp") || cmd.toLowerCase().equals("minatsupermission") || cmd.toLowerCase().equals("minatsupermissions")) {
             if (args == null) {
                 System.out.println("Args is null.");
-                help(id);
+                help(connection, id);
                 return true;
             }
             Player player = null;
@@ -176,52 +177,52 @@ public class Main extends Plugin {
             }
             switch (args.length) {
                 case 0:
-                    help(id);
+                    help(connection, id);
                     return true;
                 case 1:
                     if (args[0].toLowerCase().equals("help")) {
                         //mp help
-                        help(id);
+                        help(connection, id);
                         return true;
                     }
                     if (args[0].toLowerCase().equals("reload")) {
                         if (permissionsApi.hasPlayerPermission(from, "minatsupermissions.reload")) {
                             reload();
-                            getBot().getTcpClient().writeMessage(from, messages.getMessage("reloadPlugin"));
+                            connection.sendMessage(from, messages.getMessage("reloadPlugin"));
                             return true;
                         }
-                        getBot().getTcpClient().writeMessage(id, messages.getMessage("noPerm"));
+                        connection.sendMessage(id, messages.getMessage("noPerm"));
                         return true;
                     }
                     if (args[0].toLowerCase().equals("group") || args[0].toLowerCase().equals("groups")) {
                         //mp group/groups
                         if (permissionsApi.hasPlayerPermission(from, "minatsupermissions.groups")) {
-                            getBot().getTcpClient().writeMessage(id, messages.getMessage("registeredGroups") + "\n" + Utils.groupToString(permissionsApi.getGroups()));
+                            connection.sendMessage(id, messages.getMessage("registeredGroups") + "\n" + Utils.groupToString(permissionsApi.getGroups()));
                             return true;
                         }
-                        getBot().getTcpClient().writeMessage(id, messages.getMessage("noPerm"));
+                        connection.sendMessage(id, messages.getMessage("noPerm"));
                         return true;
                     }
                     //Invalid command
-                    getBot().getTcpClient().writeMessage(id, messages.getMessage("invalidCommand"));
+                    connection.sendMessage(id, messages.getMessage("invalidCommand"));
                     return true;
                 case 2:
                     if (args[0].toLowerCase().equals("group") || args[0].toLowerCase().equals("groups")) {
                         if (args[1].toLowerCase().equals("list")) {
                             //mp group list
                             if (permissionsApi.hasPlayerPermission(from, "minatsupermissions.groups")) {
-                                getBot().getTcpClient().writeMessage(id, messages.getMessage("registeredGroups") + "\n" + Utils.groupToString(permissionsApi.getGroups()));
+                                connection.sendMessage(id, messages.getMessage("registeredGroups") + "\n" + Utils.groupToString(permissionsApi.getGroups()));
                                 return true;
                             }
-                            getBot().getTcpClient().writeMessage(id, messages.getMessage("noPerm"));
+                            connection.sendMessage(id, messages.getMessage("noPerm"));
                             return true;
                         } else if (group != null) {
                             //mp group <group>
                             if (permissionsApi.hasPlayerPermission(from, "minatsupermissions.group.info")) {
-                                getBot().getTcpClient().writeMessage(id, Utils.groupInfoToString(group));
+                                connection.sendMessage(id, Utils.groupInfoToString(group));
                                 return true;
                             }
-                            getBot().getTcpClient().writeMessage(id, messages.getMessage("noPerm"));
+                            connection.sendMessage(id, messages.getMessage("noPerm"));
                             return true;
                         }
                     }
@@ -229,15 +230,15 @@ public class Main extends Plugin {
                         if (player != null) {
                             //mp player <player>
                             if (permissionsApi.hasPlayerPermission(from, "minatsupermissions.player.info")) {
-                                getBot().getTcpClient().writeMessage(id, Utils.playerInfoToString(player));
+                                connection.sendMessage(id, Utils.playerInfoToString(player));
                                 return true;
                             }
-                            getBot().getTcpClient().writeMessage(id, messages.getMessage("noPerm"));
+                            connection.sendMessage(id, messages.getMessage("noPerm"));
                             return true;
                         }
                     }
                     //Invalid command.
-                    getBot().getTcpClient().writeMessage(id, messages.getMessage("invalidCommand"));
+                    connection.sendMessage(id, messages.getMessage("invalidCommand"));
                     return true;
                 case 3:
                     if (args[0].toLowerCase().equals("group") || args[0].toLowerCase().equals("groups")) {
@@ -245,46 +246,46 @@ public class Main extends Plugin {
                             //mp group create <group>
                             if (permissionsApi.hasPlayerPermission(from, "minatsupermissions.group.create")) {
                                 if (permissionsApi.isGroup(args[2])) {
-                                    getBot().getTcpClient().writeMessage(id, messages.getMessage("alreadyGroup", args[2]));
+                                    connection.sendMessage(id, messages.getMessage("alreadyGroup", args[2]));
                                     return true;
                                 } else {
                                     permissionsApi.createGroup(args[2]);
-                                    getBot().getTcpClient().writeMessage(id, messages.getMessage("createdGroup", args[2]));
+                                    connection.sendMessage(id, messages.getMessage("createdGroup", args[2]));
                                     return true;
                                 }
                             }
-                            getBot().getTcpClient().writeMessage(id, messages.getMessage("noPerm"));
+                            connection.sendMessage(id, messages.getMessage("noPerm"));
                             return true;
                         } else if (args[1].toLowerCase().equals("delete")) {
                             //mp group delete <group>
                             if (permissionsApi.hasPlayerPermission(from, "minatsupermissions.group.create")) {
                                 if (!permissionsApi.isGroup(args[2])) {
-                                    getBot().getTcpClient().writeMessage(id, messages.getMessage("notGroup", args[2]));
+                                    connection.sendMessage(id, messages.getMessage("notGroup", args[2]));
                                     return true;
                                 } else {
                                     permissionsApi.deleteGroup(args[2]);
-                                    getBot().getTcpClient().writeMessage(id, messages.getMessage("deleteGroup", args[2]));
+                                    connection.sendMessage(id, messages.getMessage("deleteGroup", args[2]));
                                     return true;
                                 }
                             }
-                            getBot().getTcpClient().writeMessage(id, messages.getMessage("noPerm"));
+                            connection.sendMessage(id, messages.getMessage("noPerm"));
                             return true;
                         } else if (group != null) {
                             if (args[2].toLowerCase().equals("perm") || args[2].toLowerCase().equals("perms")) {
                                 //mp group <group> perms
                                 if (permissionsApi.hasPlayerPermission(from, "minatsupermissions.group.perms.info")) {
-                                    getBot().getTcpClient().writeMessage(id, Utils.groupPermsToString(group));
+                                    connection.sendMessage(id, Utils.groupPermsToString(group));
                                     return true;
                                 }
-                                getBot().getTcpClient().writeMessage(id, messages.getMessage("noPerm"));
+                                connection.sendMessage(id, messages.getMessage("noPerm"));
                                 return true;
                             } else if (args[2].toLowerCase().equals("players") || args[2].toLowerCase().equals("player")) {
                                 //mp group <group> players
                                 if (permissionsApi.hasPlayerPermission(from, "minatsupermissions.group.players")) {
-                                    getBot().getTcpClient().writeMessage(id, Utils.groupPlayersToString(group));
+                                    connection.sendMessage(id, Utils.groupPlayersToString(group));
                                     return true;
                                 }
-                                getBot().getTcpClient().writeMessage(id, messages.getMessage("noPerm"));
+                                connection.sendMessage(id, messages.getMessage("noPerm"));
                                 return true;
                             }
                         }
@@ -294,31 +295,31 @@ public class Main extends Plugin {
                             if (args[2].toLowerCase().equals("group") || args[2].toLowerCase().equals("groups")) {
                                 //mp player <player> group
                                 if (permissionsApi.hasPlayerPermission(from, "minatsupermissions.player.groups")) {
-                                    getBot().getTcpClient().writeMessage(id, Utils.playerGroupsToString(player));
+                                    connection.sendMessage(id, Utils.playerGroupsToString(player));
                                     return true;
                                 }
-                                getBot().getTcpClient().writeMessage(id, messages.getMessage("noPerm"));
+                                connection.sendMessage(id, messages.getMessage("noPerm"));
                             } else if (args[2].toLowerCase().equals("perm") || args[2].toLowerCase().equals("perms")) {
                                 //mp player <player> perm
                                 if (permissionsApi.hasPlayerPermission(from, "minatsupermissions.player.perms.info")) {
-                                    getBot().getTcpClient().writeMessage(id, Utils.playerPermsToString(player));
+                                    connection.sendMessage(id, Utils.playerPermsToString(player));
                                     return true;
                                 }
-                                getBot().getTcpClient().writeMessage(id, messages.getMessage("noPerm"));
+                                connection.sendMessage(id, messages.getMessage("noPerm"));
                                 return true;
                             } else if (args[2].toLowerCase().equals("info")) {
                                 //mp player <player> info
                                 if (permissionsApi.hasPlayerPermission(from, "minatsupermissions.player.info")) {
-                                    getBot().getTcpClient().writeMessage(id, Utils.playerInfoToString(player));
+                                    connection.sendMessage(id, Utils.playerInfoToString(player));
                                     return true;
                                 }
-                                getBot().getTcpClient().writeMessage(id, messages.getMessage("noPerm"));
+                                connection.sendMessage(id, messages.getMessage("noPerm"));
                                 return true;
                             }
                         }
                     }
                     //Invalid command
-                    getBot().getTcpClient().writeMessage(id, messages.getMessage("invalidCommand"));
+                    connection.sendMessage(id, messages.getMessage("invalidCommand"));
                     return true;
                 case 4:
                     if (args[0].toLowerCase().equals("group") || args[0].toLowerCase().equals("groups")) {
@@ -327,42 +328,42 @@ public class Main extends Plugin {
                                 //mp group <group> add <perm>
                                 if (permissionsApi.hasPlayerPermission(from, "minatsupermissions.group.perms.add")) {
                                     if (permissionsApi.hasGroupPermission(group, args[3])) {
-                                        getBot().getTcpClient().writeMessage(id, messages.getMessage("groupAlreadyPerms", args[1], args[3]));
+                                        connection.sendMessage(id, messages.getMessage("groupAlreadyPerms", args[1], args[3]));
                                         return true;
                                     }else{
                                         permissionsApi.addGroupPermission(group, args[3]);
-                                        getBot().getTcpClient().writeMessage(id, messages.getMessage("groupPermAdded", args[1], args[3]));
+                                        connection.sendMessage(id, messages.getMessage("groupPermAdded", args[1], args[3]));
                                         return true;
                                     }
                                 }
-                                getBot().getTcpClient().writeMessage(id, messages.getMessage("noPerm"));
+                                connection.sendMessage(id, messages.getMessage("noPerm"));
                                 return true;
                             } else if (args[2].toLowerCase().equals("del")) {
                                 //mp group <group> del <perm>
                                 if (permissionsApi.hasPlayerPermission(from, "minatsupermissions.group.perms.del")) {
                                     if (!permissionsApi.hasGroupPermission(group, args[3])) {
-                                        getBot().getTcpClient().writeMessage(id, messages.getMessage("groupDontPerm", args[1], args[3]));
+                                        connection.sendMessage(id, messages.getMessage("groupDontPerm", args[1], args[3]));
                                         return true;
                                     }else{
                                         permissionsApi.delGroupPermission(group, args[3]);
-                                        getBot().getTcpClient().writeMessage(id, messages.getMessage("groupDelPerm", args[1], args[3]));
+                                        connection.sendMessage(id, messages.getMessage("groupDelPerm", args[1], args[3]));
                                         return true;
                                     }
                                 }
-                                getBot().getTcpClient().writeMessage(id, messages.getMessage("noPerm"));
+                                connection.sendMessage(id, messages.getMessage("noPerm"));
                                 return true;
                             } else if (args[2].toLowerCase().equals("has")) {
                                 //mp group <group> has <perm>
                                 if (permissionsApi.hasPlayerPermission(from, "minatsupermissions.group.perms.has")) {
                                     if (permissionsApi.hasGroupPermission(group, args[3])) {
-                                        getBot().getTcpClient().writeMessage(id, messages.getMessage("groupHasPerm", args[1], args[3]));
+                                        connection.sendMessage(id, messages.getMessage("groupHasPerm", args[1], args[3]));
                                         return true;
                                     }else{
-                                        getBot().getTcpClient().writeMessage(id, messages.getMessage("groupNoHasPerm", args[1], args[3]));
+                                        connection.sendMessage(id, messages.getMessage("groupNoHasPerm", args[1], args[3]));
                                         return true;
                                     }
                                 }
-                                getBot().getTcpClient().writeMessage(id, messages.getMessage("noPerm"));
+                                connection.sendMessage(id, messages.getMessage("noPerm"));
                                 return true;
                             }
                         }
@@ -373,48 +374,48 @@ public class Main extends Plugin {
                                 //mp player <player> add <perm>
                                 if (permissionsApi.hasPlayerPermission(from, "minatsupermissions.player.perms.add")) {
                                     if (permissionsApi.hasPlayerPermission(player, args[3])) {
-                                        getBot().getTcpClient().writeMessage(id, messages.getMessage("playerAlreadyPerms", args[1], args[3]));
+                                        connection.sendMessage(id, messages.getMessage("playerAlreadyPerms", args[1], args[3]));
                                         return true;
                                     }else{
                                         permissionsApi.addPlayerPermission(player, args[3]);
-                                        getBot().getTcpClient().writeMessage(id, messages.getMessage("playerPermAdded", args[1], args[3]));
+                                        connection.sendMessage(id, messages.getMessage("playerPermAdded", args[1], args[3]));
                                         return true;
                                     }
                                 }
-                                getBot().getTcpClient().writeMessage(id, messages.getMessage("noPerm"));
+                                connection.sendMessage(id, messages.getMessage("noPerm"));
                                 return true;
                             } else if (args[2].toLowerCase().equals("del")) {
                                 //mp player <player> del <perm>
                                 if (permissionsApi.hasPlayerPermission(from, "minatsupermissions.player.perms.del")) {
                                     if (!permissionsApi.hasPlayerPermission(player, args[3])) {
-                                        getBot().getTcpClient().writeMessage(id, messages.getMessage("playerDontPerm", args[1], args[3]));
+                                        connection.sendMessage(id, messages.getMessage("playerDontPerm", args[1], args[3]));
                                         return true;
                                     }else{
                                         permissionsApi.delPlayerPermission(player, args[3]);
-                                        getBot().getTcpClient().writeMessage(id, messages.getMessage("playerDelPerm", args[1], args[3]));
+                                        connection.sendMessage(id, messages.getMessage("playerDelPerm", args[1], args[3]));
                                         return true;
                                     }
                                 }
-                                getBot().getTcpClient().writeMessage(id, messages.getMessage("noPerm"));
+                                connection.sendMessage(id, messages.getMessage("noPerm"));
                                 return true;
                             } else if (args[2].toLowerCase().equals("has")) {
                                 //mp player <player> has <perm>
                                 if (permissionsApi.hasPlayerPermission(from, "minatsupermissions.player.perms.has")) {
                                     if (permissionsApi.hasPlayerPermission(player, args[3])) {
-                                        getBot().getTcpClient().writeMessage(id, messages.getMessage("playerHasPerm", args[1], args[3]));
+                                        connection.sendMessage(id, messages.getMessage("playerHasPerm", args[1], args[3]));
                                         return true;
                                     }else{
-                                        getBot().getTcpClient().writeMessage(id, messages.getMessage("playerNoHasPerm", args[1], args[3]));
+                                        connection.sendMessage(id, messages.getMessage("playerNoHasPerm", args[1], args[3]));
                                         return true;
                                     }
                                 }
-                                getBot().getTcpClient().writeMessage(id, messages.getMessage("noPerm"));
+                                connection.sendMessage(id, messages.getMessage("noPerm"));
                                 return true;
                             }
                         }
                     }
                     //invalid command
-                    getBot().getTcpClient().writeMessage(id, messages.getMessage("invalidCommand"));
+                    connection.sendMessage(id, messages.getMessage("invalidCommand"));
                     return true;
                 case 5:
                     if (args[0].toLowerCase().equals("player") || args[0].toLowerCase().equals("players")) {
@@ -424,72 +425,72 @@ public class Main extends Plugin {
                                 if (permissionsApi.hasPlayerPermission(from, "minatsupermissions.player.group.add")) {
                                     Group g = permissionsApi.getGroup(args[4]);
                                     if (g == null) {
-                                        getBot().getTcpClient().writeMessage(id, messages.getMessage("invalidGroup", args[4]));
+                                        connection.sendMessage(id, messages.getMessage("invalidGroup", args[4]));
                                         return true;
                                     }
                                     if (permissionsApi.hasGroup(player, g)){
-                                        getBot().getTcpClient().writeMessage(id, messages.getMessage("playerAlreadyGroup", args[1], args[4]));
+                                        connection.sendMessage(id, messages.getMessage("playerAlreadyGroup", args[1], args[4]));
                                         return true;
                                     }else {
                                         permissionsApi.addToGroup(player, group);
-                                        getBot().getTcpClient().writeMessage(id, messages.getMessage("playerNowGroup", args[1], args[4]));
+                                        connection.sendMessage(id, messages.getMessage("playerNowGroup", args[1], args[4]));
                                         return true;
                                     }
                                 }
-                                getBot().getTcpClient().writeMessage(id, messages.getMessage("noPerm"));
+                                connection.sendMessage(id, messages.getMessage("noPerm"));
                                 return true;
                             } else if (args[3].toLowerCase().equals("del")) {
                                 //mp player <player> del group <group>
                                 if (permissionsApi.hasPlayerPermission(from, "minatsupermissions.player.group.del")) {
                                     Group g = permissionsApi.getGroup(args[4]);
                                     if (g == null) {
-                                        getBot().getTcpClient().writeMessage(id, messages.getMessage("invalidGroup", args[4]));
+                                        connection.sendMessage(id, messages.getMessage("invalidGroup", args[4]));
                                         return true;
                                     }
                                     if (!permissionsApi.hasGroup(player, g)){
-                                        getBot().getTcpClient().writeMessage(id, messages.getMessage("playerNoGroup", args[1], args[4]));
+                                        connection.sendMessage(id, messages.getMessage("playerNoGroup", args[1], args[4]));
                                         return true;
                                     }else {
                                         permissionsApi.removeFromGroup(player, g);
-                                        getBot().getTcpClient().writeMessage(id, messages.getMessage("playerDelGroup", args[1], args[4]));
+                                        connection.sendMessage(id, messages.getMessage("playerDelGroup", args[1], args[4]));
                                         return true;
                                     }
                                 }
-                                getBot().getTcpClient().writeMessage(id, messages.getMessage("noPerm"));
+                                connection.sendMessage(id, messages.getMessage("noPerm"));
                                 return true;
                             } else if (args[3].toLowerCase().equals("has")) {
                                 //mp player <player> has group <group>
                                 if (permissionsApi.hasPlayerPermission(from, "minatsupermissions.player.group.has")) {
                                     Group g = permissionsApi.getGroup(args[4]);
                                     if (g == null) {
-                                        getBot().getTcpClient().writeMessage(id, messages.getMessage("invalidGroup", args[4]));
+                                        connection.sendMessage(id, messages.getMessage("invalidGroup", args[4]));
                                         return true;
                                     }
                                     if (permissionsApi.hasGroup(player, g)){
-                                        getBot().getTcpClient().writeMessage(id, messages.getMessage("playerHasGroup", args[1], args[4]));
+                                        connection.sendMessage(id, messages.getMessage("playerHasGroup", args[1], args[4]));
                                         return true;
                                     }else {
-                                        getBot().getTcpClient().writeMessage(id, messages.getMessage("playerNoHasGroup", args[1], args[4]));
+                                        connection.sendMessage(id, messages.getMessage("playerNoHasGroup", args[1], args[4]));
                                         return true;
                                     }
                                 }
-                                getBot().getTcpClient().writeMessage(id, messages.getMessage("noPerm"));
+                                connection.sendMessage(id, messages.getMessage("noPerm"));
                                 return true;
                             }
                         }
                     }
                     //invalid command
-                    getBot().getTcpClient().writeMessage(id, messages.getMessage("invalidCommand"));
+                    connection.sendMessage(id, messages.getMessage("invalidCommand"));
                     return true;
                 default:
-                    help(id);
+                    help(connection, id);
                     return true;
             }
         }
         return false;
     }
 
-    public void help(String id) {
+    public void help(Connection connection, String id) {
         System.out.println("Help command ran.");
         System.out.println(id);
         String s = "";
@@ -517,7 +518,7 @@ public class Main extends Plugin {
         s += "mp player (player) - Returns a summary for a player.";
 
         System.out.println(s);
-        getBot().getTcpClient().writeMessage(id, s);
+        connection.sendMessage(id, s);
     }
     public Map getConfig() {
         return config;
