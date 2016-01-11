@@ -96,7 +96,7 @@ public class TCPServer {
                         continue;
                     }
 
-                    bot.read(uuid, json);
+                    bot.read(this, json);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {

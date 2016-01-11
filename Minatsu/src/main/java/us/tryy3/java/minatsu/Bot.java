@@ -27,12 +27,13 @@ public class Bot {
     private TCPServer tcpServer;
     private Options options;
     private PluginManager pluginManager;
+    private String version;
     private final Logger logger = new Logger(null);
-    private final String version = "0.0.1";
 
-    public Bot(String[] args) throws MalformedURLException {
+    public Bot(String version, Options options) throws MalformedURLException {
         logger.info("Initalizing Minatsu Version " + version);
-        this.options = new Options(args);
+        this.options = options;
+        this.version = version;
         this.plugins = new HashMap<>();
         this.tcpServer = new TCPServer(options, this);
         this.event = new Event();
