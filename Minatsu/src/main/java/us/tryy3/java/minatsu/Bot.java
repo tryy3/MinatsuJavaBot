@@ -24,17 +24,17 @@ public class Bot {
     private Event event;
     private CommandManager commandManager;
     private Map<String, Plugin> plugins;
-    private TCPClient tcpClient;
+    private TCPServer tcpServer;
     private Options options;
     private PluginManager pluginManager;
-    private Logger logger = new Logger(null);
-    private String version = "0.0.1";
+    private final Logger logger = new Logger(null);
+    private final String version = "0.0.1";
 
     public Bot(String[] args) throws MalformedURLException {
         logger.info("Initalizing Minatsu Version " + version);
         this.options = new Options(args);
         this.plugins = new HashMap<>();
-        this.tcpClient = new TCPClient("127.0.0.1", 1337, this);
+        this.tcpServer = new TCPServer(options, this);
         this.event = new Event();
         this.commandManager = new CommandManager();
 
@@ -86,16 +86,16 @@ public class Bot {
         this.pluginManager = new PluginManager(plugins);
     }
 
-    public void read(JsonArray array) {
+    public void read(TCPServer.Connection connection, JsonArray array) {
         switch (array.get(0).getAsString()) {
             case "onMessageEvent": {
                 if (array.size() <= 1) {
-                    logger.severe("TCPClient sent message event but no args was sent.");
+                    logger.severe("TCPServer sent message event but no args was sent.");
                     return;
                 }
                 JsonArray ja = array.get(1).getAsJsonArray();
                 if (ja.size() < 3) {
-                    logger.severe("TCPClient sent message event but not enough args was sent.");
+                    logger.severe("TCPServer sent message event but not enough args was sent.");
                     return;
                 }
                 String msg = ja.get(2).getAsString();
@@ -111,19 +111,19 @@ public class Bot {
                     Boolean knownCommand = false;
 
                     for (Plugin plugin : getPlugins().values()) {
-                        if (plugin.onCommand(from, id, command, args)) {
+                        if (plugin.onCommand(connection, from, id, command, args)) {
                             knownCommand = true;
                         }
                     }
 
                     for (Command cmd : commandManager.getCommands()) {
                         if (cmd.getName().equals(command)) {
-                            knownCommand = cmd.onCommand(from, id, cmd, command, args);
+                            knownCommand = cmd.onCommand(connection, from, id, cmd, command, args);
                             break;
                         } else {
                             for (String s : cmd.getAliases()) {
                                 if (s.equals(command)) {
-                                    knownCommand = cmd.onCommand(from, id, cmd, command, args);
+                                    knownCommand = cmd.onCommand(connection, from, id, cmd, command, args);
                                     break;
                                 }
                             }
@@ -131,7 +131,7 @@ public class Bot {
                     }
 
                     if (!knownCommand) {
-                        getTcpClient().writeMessage(id, "Unknown command, please check the help page.");
+                        connection.sendMessage(id, "Unknown command, please check the help page.");
                     }
                     break;
                 }
@@ -153,7 +153,7 @@ public class Bot {
         return plugins;
     }
 
-    public TCPClient getTcpClient() {
-        return tcpClient;
+    public TCPServer getTcpServer() {
+        return tcpServer;
     }
 }

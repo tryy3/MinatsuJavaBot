@@ -3,6 +3,7 @@ package us.tryy3.java.minatsu.plugins;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import us.tryy3.java.minatsu.Bot;
+import us.tryy3.java.minatsu.TCPServer.Connection;
 import us.tryy3.java.minatsu.logger.Logger;
 
 import java.io.*;
@@ -108,7 +109,8 @@ public abstract class Plugin {
 			writer.write(gson.toJson(config.getMap( )));
 			writer.close( );
      */
-    public boolean onCommand(String from, String id, String cmd, String[] args) {
+
+    public boolean onCommand(Connection connection, String from, String id, String cmd, String[] args) {
         return false;
     }
 

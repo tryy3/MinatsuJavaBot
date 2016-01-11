@@ -1,5 +1,7 @@
 package us.tryy3.java.minatsu.command;
 
+import us.tryy3.java.minatsu.TCPServer.Connection;
+
 import java.util.List;
 
 /**
@@ -37,7 +39,7 @@ public class Command implements ICommand {
     }
 
     @Override
-    public Boolean onCommand(String user, String channel, Command command, String label, String[] args) {
+    public Boolean onCommand(Connection connection, String user, String channel, Command command, String label, String[] args) {
         return false;
     }
 

@@ -1,4 +1,4 @@
-# MinatsuSkype
+# Minatsu
 ## Installation instructions
 
 *Currently a bit confusing to setup, but will be improved in future updates*
