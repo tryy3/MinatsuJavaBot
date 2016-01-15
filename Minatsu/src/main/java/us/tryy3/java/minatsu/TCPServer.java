@@ -8,6 +8,7 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -81,11 +82,16 @@ public class TCPServer {
         }
     }
 
+    public void remove(Connection connection) {
+        this.connections.remove(connection.getUuid());
+    }
+
     public class Connection extends Thread {
         private Socket socket;
         private UUID uuid;
         private BufferedReader in;
         private PrintWriter out;
+        private TCPServer parent;
 
         public Connection(Socket socket, UUID uuid) {
             this.socket = socket;
@@ -112,12 +118,26 @@ public class TCPServer {
                     }
 
                     bot.read(this, json);
+                } catch (SocketException e) {
+                    try {
+                        in.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                    this.parent.remove(this);
+                    this.interrupt();
                 } catch (IOException e) {
+                    System.out.println("Error");
                     e.printStackTrace();
                 } finally {
+                    System.out.println("Close");
                     out.close();
                 }
             }
+        }
+
+        public UUID getUuid() {
+            return uuid;
         }
 
         public void sendMessage(String message) {

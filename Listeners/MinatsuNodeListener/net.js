@@ -15,58 +15,65 @@ skyweb.login(username, password).then(function(acc)
 })
 
 var HOST = "127.0.0.1";
-var PORT = "1337";
+var PORT = "6868";
 
-net.createServer(function(sock)
-{
+var timeout = 0;
 
-    // We have a connection - a socket object is assigned to the connection automatically
-    console.log('CONNECTED: ' + sock.remoteAddress + ':' + sock.remotePort);
+var client = new net.Socket();
 
-    // Add a 'data' event handler to this instance of socket
-    sock.on('data', function(data)
-    {
-        console.log(data.toString().substring(2));
-        var dataJson = JSON.parse(data.toString().substring(2));
-        console.log(dataJson);
-        if (dataJson.length < 2) {
-            console.log("The data does not have enough arguments.")
+var connect = function() {
+	if (timeout > 0) {
+		console.log("Trying to connect in " + timeout + " seconds.");
+	}
+
+	setTimeout(function() {
+		client.connect(PORT, HOST, function() {
+			console.log("Connected");
+			timeout = 0;
+		});
+	}, timeout * 1000);
+	timeout = (timeout <= 60) ? timeout+10 : timeout;
+}
+
+connect();
+
+client.on('error', function() {
+	console.log("Can't connect, trying again.");
+	connect();
+})
+
+client.on("data", function(data) {
+	console.log("Received: " + data);
+	var dataJson = JSON.parse(data.toString().substring(2));
+	console.log(dataJson);
+	if (dataJson.length < 2) {
+		console.log("The data does not have enough arguments.");
+		console.log("DATA " + client.remoteAddress + ": " + data);
+		return;
+	}
+
+	if (dataJson[0] == "sendMessage") {
+		if (dataJson[1].length < 2) {
+            console.log("The arguments is invalid.")
             console.log('DATA ' + sock.remoteAddress + ': ' + data);
             return;
-        }
+		}
 
-        if (dataJson[0] == "sendMessage") {
-            if(dataJson[1].length < 2) {
-                console.log("The arguments is invalid.")
-                console.log('DATA ' + sock.remoteAddress + ': ' + data);
-                return;
-            }
+        skyweb.sendMessage(dataJson[1][0], dataJson[1][1]);
+	}
+});
 
-            skyweb.sendMessage(dataJson[1][0], dataJson[1][1]);
-        }
-        // Write the data back to the socket, the client will receive it as data from the server
-        //sock.write('You said "' + data + '"\n');
+client.on("close", function() {
+	console.log("Connection closed.");
+})
 
-    });
-    skyweb.messagesCallback = function(messages)
-    {
-        messages.forEach(function(message)
-        {
-            if (message.resource.from.indexOf("tryy3.bot") === -1 && message.resource.messagetype !== 'Control/Typing' && message.resource.messagetype !== 'Control/ClearTyping')
-            {
-                var link = message.resource.conversationLink;
-                var id = link.substring(link.lastIndexOf("/") + 1);
-                var from = message.resource.from.substring(message.resource.from.lastIndexOf('/') + 1);
-                sock.write(JSON.stringify(["onMessageEvent", [id, from, message.resource.content]]) + "\n");
-            }
-        });
-    }
-    // Add a 'close' event handler to this instance of socket
-    sock.on('close', function(data)
-    {
-        console.log('CLOSED: ' + sock.remoteAddress + ' ' + sock.remotePort);
-    });
-
-}).listen(PORT, HOST);
-
-console.log('Server listening on ' + HOST + ':' + PORT);
+skyweb.messagesCallback = function(messages) {
+	messages.forEach(function(message) {
+		if (message.resource.from.indexOf("tryy3.bot")=== -1 && message.resource.messagetype !== 'Control/Typing' && message.resource.messagetype !== 'Control/ClearTyping') {
+			var link = message.resource.conversationLink;
+            var id = link.substring(link.lastIndexOf("/") + 1);
+            var from = message.resource.from.substring(message.resource.from.lastIndexOf('/') + 1);
+            client.write(JSON.stringify(["onMessageEvent", [id, from, message.resource.content]]) + "\n");
+		}
+	})
+};
