@@ -10,6 +10,7 @@ import java.util.List;
 public class Command implements ICommand {
     private String name = null;
     private String usage = null;
+    private String desc = null;
     private List<String> aliases = null;
     private List<Command> children = null;
 
@@ -39,6 +40,11 @@ public class Command implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return desc;
+    }
+
+    @Override
     public Boolean onCommand(Connection connection, String user, String channel, Command command, String label, String[] args) {
         return false;
     }
@@ -61,5 +67,10 @@ public class Command implements ICommand {
     @Override
     public void setAliases(List<String> aliases) {
         this.aliases = aliases;
+    }
+
+    @Override
+    public void setDescription(String desc) {
+        this.desc = desc;
     }
 }

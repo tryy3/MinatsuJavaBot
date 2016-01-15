@@ -60,9 +60,24 @@ public class TCPServer {
         return this.connections.get(uuid);
     }
 
+    public Map<UUID, Connection> getConnections() {
+        return connections;
+    }
+
     public void sendAll(String message) {
         for (Connection connection : connections.values()) {
             connection.sendMessage(message);
+        }
+    }
+
+    public void stop() {
+        for (Connection connection : connections.values()) {
+            connection.close();
+        }
+        try {
+            this.server.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -109,6 +124,10 @@ public class TCPServer {
             out.println(message);
         }
 
+        public void sendMessage(String message, Object... var) {
+            sendMessage(String.format(message, var));
+        }
+
         public void sendMessage(String id, String message) {
             JsonArray writeArgs = new JsonArray();
             JsonArray msgArgs = new JsonArray();
@@ -120,6 +139,14 @@ public class TCPServer {
             writeArgs.add(msgArgs);
 
             sendMessage(writeArgs.toString());
+        }
+
+        public void close() {
+            try {
+                this.socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

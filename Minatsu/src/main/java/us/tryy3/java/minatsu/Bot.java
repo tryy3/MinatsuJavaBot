@@ -29,6 +29,7 @@ public class Bot {
     private PluginManager pluginManager;
     private String version;
     private final Logger logger = new Logger(null);
+    private Long startupTime = new GregorianCalendar().getTimeInMillis();
 
     public Bot(String version, Options options) throws MalformedURLException {
         logger.info("Initalizing Minatsu Version " + version);
@@ -52,7 +53,15 @@ public class Bot {
 
         logger.fine("Folder found.");
 
-        File[] fileList = pluginDir.listFiles(new FileFilter() {
+        //TODO: Add some sort of dependency system and order system.
+
+        loadPlugins(pluginDir);
+
+        this.pluginManager = new PluginManager(plugins);
+    }
+
+    private void loadPlugins(File file) {
+        File[] fileList = file.listFiles(new FileFilter() {
             public boolean accept(File path) {
                 return path.getPath().toLowerCase().endsWith(".jar");
             }
@@ -63,18 +72,23 @@ public class Bot {
         URL[] urls = new URL[fileList.length];
 
         for (int i = 0; i < fileList.length; i++) {
-            urls[i] = fileList[i].toURI().toURL();
+            try {
+                urls[i] = fileList[i].toURI().toURL();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
         }
 
         URLClassLoader urlClassLoader = new URLClassLoader(urls);
 
         ServiceLoader<Plugin> pluginLoader = ServiceLoader.load(Plugin.class, urlClassLoader);
 
-        Map<String, Plugin> plugins = new HashMap<>();
+        this.plugins = new HashMap<>();
 
-        for (Plugin plugin : pluginLoader) {
-            plugin.init(this, pluginDir);
+       for (Plugin plugin : pluginLoader) {
+            plugin.init(this, file);
             PluginDescription desc = plugin.getDescription();
+
             if (this.plugins.containsKey(desc.getName())) {
                 logger.severe("The plugin " + desc.getName() + " already exists.");
             } else {
@@ -83,8 +97,37 @@ public class Bot {
                 plugin.onStart();
             }
         }
+    }
 
-        this.pluginManager = new PluginManager(plugins);
+    private void unloadPlugins() {
+        for (Plugin plugin : plugins.values()) {
+            plugin.onStop();
+        }
+    }
+
+    public void reloadPlugins() {
+        File pluginDir = new File(options.getPluginPath());
+
+        if (!pluginDir.exists()) {
+            pluginDir.mkdirs();
+            logger.fine("Creating plugins folder.");
+        }
+
+        if (pluginDir.exists() && pluginDir.isFile()) {
+            throw new Error("Plugins folder is a file.");
+        }
+
+        logger.fine("Folder found.");
+
+        unloadPlugins();
+        loadPlugins(pluginDir);
+    }
+
+    public void stop() {
+        //broadcastAll("Bot is shutting down now.");
+        unloadPlugins();
+
+        getTcpServer().stop();
     }
 
     public void read(TCPServer.Connection connection, JsonArray array) {
@@ -156,5 +199,9 @@ public class Bot {
 
     public TCPServer getTcpServer() {
         return tcpServer;
+    }
+
+    public Long getStartupTime() {
+        return startupTime;
     }
 }
