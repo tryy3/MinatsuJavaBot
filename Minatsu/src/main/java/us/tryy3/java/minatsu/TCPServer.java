@@ -16,7 +16,7 @@ import java.util.UUID;
 /**
  * Created by tryy3 on 2016-01-09.
  */
-public class TCPServer {
+public class TCPServer extends Thread {
     private int port;
     private ServerSocket server;
     private Bot bot;
@@ -26,6 +26,11 @@ public class TCPServer {
     public TCPServer(Options options, final Bot bot) {
         this.bot = bot;
         port = options.getPort();
+
+    }
+
+    @Override
+    public void run() {
         try {
             server = new ServerSocket(port);
 
@@ -38,7 +43,7 @@ public class TCPServer {
 
                 UUID uuid = UUID.randomUUID();
 
-                Connection connection = new Connection(socket, uuid);
+                Connection connection = new Connection(socket, uuid, this);
                 connections.put(uuid, connection);
                 connection.start();
             }
@@ -71,12 +76,13 @@ public class TCPServer {
         }
     }
 
-    public void stop() {
+    public void stopConnection() {
         for (Connection connection : connections.values()) {
             connection.close();
         }
         try {
             this.server.close();
+            this.interrupt();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -93,9 +99,10 @@ public class TCPServer {
         private PrintWriter out;
         private TCPServer parent;
 
-        public Connection(Socket socket, UUID uuid) {
+        public Connection(Socket socket, UUID uuid, TCPServer parent) {
             this.socket = socket;
             this.uuid = uuid;
+            this.parent = parent;
             try {
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 out = new PrintWriter(socket.getOutputStream(), true);
@@ -121,17 +128,16 @@ public class TCPServer {
                 } catch (SocketException e) {
                     try {
                         in.close();
+                        out.close();
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
                     this.parent.remove(this);
                     this.interrupt();
+                    break;
                 } catch (IOException e) {
                     System.out.println("Error");
                     e.printStackTrace();
-                } finally {
-                    System.out.println("Close");
-                    out.close();
                 }
             }
         }

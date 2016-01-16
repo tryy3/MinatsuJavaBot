@@ -2,6 +2,7 @@ package us.tryy3.java.minatsu.command;
 
 import us.tryy3.java.minatsu.TCPServer.Connection;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,8 +12,8 @@ public class Command implements ICommand {
     private String name = null;
     private String usage = null;
     private String desc = null;
-    private List<String> aliases = null;
-    private List<Command> children = null;
+    private List<String> aliases = new ArrayList<>();
+    private List<Command> children = new ArrayList<>();
 
     public Command() {}
     public Command(String name) {

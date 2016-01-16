@@ -162,7 +162,6 @@ public class Main extends Plugin {
      */
     @Override
     public boolean onCommand(Connection connection, String from, String id, String cmd, String[] args) {
-        System.out.println("Message found...");
         if (cmd.toLowerCase().equals("mp") || cmd.toLowerCase().equals("minatsupermission") || cmd.toLowerCase().equals("minatsupermissions")) {
             if (args == null) {
                 System.out.println("Args is null.");

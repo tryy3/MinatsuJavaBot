@@ -9,7 +9,7 @@ import java.util.Map;
  * Created by dennis.planting on 11/6/2015.
  */
 public class Event {
-    private HashMap<Method, Class<?>> registeredEvents;
+    private Map<Method, Class<?>> registeredEvents = new HashMap<>();
 
     public Event() {
 

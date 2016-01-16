@@ -40,6 +40,8 @@ public class Bot {
         this.event = new Event();
         this.commandManager = new CommandManager();
 
+        this.tcpServer.start();
+
         File pluginDir = new File(options.getPluginPath());
 
         if (!pluginDir.exists()) {
@@ -127,7 +129,7 @@ public class Bot {
         //broadcastAll("Bot is shutting down now.");
         unloadPlugins();
 
-        getTcpServer().stop();
+        getTcpServer().stopConnection();
     }
 
     public void read(TCPServer.Connection connection, JsonArray array) {

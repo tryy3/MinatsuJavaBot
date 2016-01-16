@@ -44,7 +44,7 @@ client.on('error', function() {
 
 client.on("data", function(data) {
 	console.log("Received: " + data);
-	var dataJson = JSON.parse(data.toString().substring(2));
+	var dataJson = JSON.parse(data.toString());
 	console.log(dataJson);
 	if (dataJson.length < 2) {
 		console.log("The data does not have enough arguments.");
