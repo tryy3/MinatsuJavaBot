@@ -3,7 +3,7 @@ package us.tryy3.minatsu.plugins.minatsucorecommands.commands;
 import us.tryy3.java.minatsu.Bot;
 import us.tryy3.java.minatsu.TCPServer;
 import us.tryy3.java.minatsu.command.Command;
-import us.tryy3.minatsuskype.plugins.minatsupermissions.PermissionsApi;
+import us.tryy3.minatsu.plugins.minatsupermissions.PermissionsApi;
 
 /**
  * Created by tryy3 on 2016-01-12.
@@ -12,8 +12,11 @@ public class HelpCMD extends Command {
     private Bot bot;
     private PermissionsApi perms;
 
-    public HelpCMD(String name) {
+    public HelpCMD(String name, Bot bot, PermissionsApi api) {
         super(name);
+
+        this.bot = bot;
+        this.perms = api;
 
         this.setUsage("help [cmd] [page]");
         this.setDescription("Show a help page on all commands or specific commands.");

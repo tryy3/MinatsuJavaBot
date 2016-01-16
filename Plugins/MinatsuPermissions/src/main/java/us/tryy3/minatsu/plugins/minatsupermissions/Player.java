@@ -2,6 +2,7 @@ package us.tryy3.minatsu.plugins.minatsupermissions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Created by dennis.planting on 11/15/2015.
@@ -12,14 +13,27 @@ public class Player {
     private List<String> permissions;
 
     public Player(String name, List<String> permissions) {
+        this.name = name;
         this.groups = new ArrayList<Group>();
         this.permissions = permissions;
     }
 
     public boolean hasPermission(String p) {
+        Pattern pattern = Pattern.compile(p);
+
         for (String s : permissions) {
-            if (s.equals(p)) {
+            if (s.equalsIgnoreCase("*")) return true;
+            if (pattern.matcher(s).find()) {
                 return true;
+            }
+        }
+
+        for (Group group : groups) {
+            for (String s : group.getPermissions()) {
+                if (s.equalsIgnoreCase("*")) return true;
+                if (pattern.matcher(s).find()) {
+                    return true;
+                }
             }
         }
         return false;

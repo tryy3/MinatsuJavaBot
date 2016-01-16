@@ -12,14 +12,14 @@ import java.util.Map;
  * Created by dennis.planting on 11/15/2015.
  */
 public class PermissionHandler {
-    private Main main;
+    private MinatsuPermissions minatsuPermissions;
 
     private List<Group> groupList;
     private List<Player> playerList;
     private Group defaultGroup;
 
-    public PermissionHandler(Main main) throws MultipleDefaultGroupsException, NoDefaultGroupException {
-        this.main = main;
+    public PermissionHandler(MinatsuPermissions minatsuPermissions) throws MultipleDefaultGroupsException, NoDefaultGroupException {
+        this.minatsuPermissions = minatsuPermissions;
         init();
     }
 
@@ -43,7 +43,7 @@ public class PermissionHandler {
         }
         players.put("Players", playersList);
 
-        main.saveDefaultConfig("players", players);
+        minatsuPermissions.saveDefaultConfig("players", players);
     }
 
     public void saveGroups() {
@@ -61,13 +61,13 @@ public class PermissionHandler {
         }
         groups.put("Groups", groupsList);
 
-        main.saveDefaultConfig("groups", groups);
+        minatsuPermissions.saveDefaultConfig("groups", groups);
     }
 
     public void loadPlayers() {
         this.playerList = new ArrayList<>();
 
-        Map players = main.getPlayers();
+        Map players = minatsuPermissions.getPlayers();
         List<Map<String, Object>> p = (List<Map<String, Object>>) players.get("Players");
         for (Map<String, Object> map : p) {
             Player player = new Player((String) map.get("Name"), (ArrayList<String>) map.get("Permissions"));
@@ -79,7 +79,7 @@ public class PermissionHandler {
                 group.addPlayer(player);
             }
             if (!player.hasGroup(defaultGroup)) {
-                this.main.getPermissionsApi().addToGroup(player, defaultGroup);
+                this.minatsuPermissions.getPermissionsApi().addToGroup(player, defaultGroup);
             }
             this.playerList.add(player);
         }
@@ -88,7 +88,7 @@ public class PermissionHandler {
     public void loadGroups() throws MultipleDefaultGroupsException, NoDefaultGroupException {
         this.groupList = new ArrayList<>();
 
-        Map groups = main.getGroups();
+        Map groups = minatsuPermissions.getGroups();
         List<Map<String, Object>> g = (List<Map<String, Object>>) groups.get("Groups");
         for (Map<String, Object> map : g) {
             Group group = new Group((String) map.get("Name"), (List<String>) map.get("Permissions"));

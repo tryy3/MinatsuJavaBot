@@ -1,5 +1,7 @@
 package us.tryy3.java.minatsu.plugins;
 
+import us.tryy3.java.minatsu.logger.Logger;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,13 +9,14 @@ import java.util.Map;
  * Created by dennis.planting on 12/5/2015.
  */
 public class PluginManager {
-    Map<String, Plugin> plugins = new HashMap<>();
+    private final Logger logger = new Logger(null);
+    Map<String, IPlugin> plugins = new HashMap<>();
 
-    public PluginManager(Map<String, Plugin> plugins) {
+    public PluginManager(Map<String, IPlugin> plugins) {
         this.plugins = plugins;
     }
 
-    public Map<String, Plugin> getPlugins() {
+    public Map<String, IPlugin> getPlugins() {
         return plugins;
     }
 
@@ -21,7 +24,7 @@ public class PluginManager {
         return plugins.containsKey(name);
     }
 
-    public Plugin getPlugin(String name) {
+    public IPlugin getPlugin(String name) {
         return this.plugins.get(name);
     }
 

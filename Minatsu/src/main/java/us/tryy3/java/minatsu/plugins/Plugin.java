@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Created by dennis.planting on 11/9/2015.
  */
-public abstract class Plugin {
+public abstract class Plugin implements IPlugin {
     private boolean isEnabled = false;
     private PluginDescription description;
     private File file;
@@ -77,6 +77,11 @@ public abstract class Plugin {
     }
     public void onStop() {
         getLogger().info("Disabling %s %s", getDescription().getName(), getDescription().getVersion());
+    }
+
+    public void unload() {
+        this.onStop();
+        this.getBot().unloadPlugin(this);
     }
 
     /* TODO: Come up with a better system for this. */

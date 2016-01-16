@@ -8,6 +8,7 @@ public class PluginDescription {
     private String version = null; // Required
     private String description = null; // Optional
     private String[] authors = null; // Optional
+    private String[] dependency = null; //Optional
     private String website = null; // Optional
     private String prefix = null; // Optional
 
@@ -15,6 +16,7 @@ public class PluginDescription {
         this.name = builder.name;
         this.version = builder.version;
         this.description = builder.description;
+        this.dependency = builder.dependency;
         this.authors = builder.authors;
         this.website = builder.website;
         this.prefix = builder.prefix;
@@ -22,6 +24,10 @@ public class PluginDescription {
 
     public String[] getAuthors() {
         return authors;
+    }
+
+    public String[] getDependency() {
+        return dependency;
     }
 
     public String getDescription() {
@@ -50,6 +56,7 @@ public class PluginDescription {
         s += (this.version != null) ? this.version + " - " : "";
         s += (this.description != null) ? this.description + " - " : "";
         s += (this.authors != null) ? this.authors + " - " : "";
+        s += (this.dependency != null) ? this.dependency + " - " : "";
         s += (this.website != null) ? this.website + " - " : "";
         s = s.substring(0, s.length() - 3);
         return s;
@@ -60,6 +67,7 @@ public class PluginDescription {
         private final String version;
         private String description;
         private String[] authors;
+        private String[] dependency;
         private String website;
         private String prefix;
 
@@ -80,6 +88,16 @@ public class PluginDescription {
 
         public DescriptionBuilder authors(String[] authors) {
             this.authors = authors;
+            return this;
+        }
+
+        public DescriptionBuilder dependency(String depend) {
+            this.dependency = new String[] {depend};
+            return this;
+        }
+
+        public DescriptionBuilder dependency(String[] depend) {
+            this.dependency = depend;
             return this;
         }
 

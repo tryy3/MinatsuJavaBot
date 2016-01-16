@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Main extends Plugin {
+public class MinatsuPermissions extends Plugin {
     private Map groups;
     private Map players;
     private Map config;
@@ -112,7 +112,7 @@ public class Main extends Plugin {
         }
         config = loadConfig(file);
         if (config == null || !config.containsKey("Players")) {
-            config = defaultGroups();
+            config = defaultPlayers();
             saveConfig(file, config);
         }
         return config;

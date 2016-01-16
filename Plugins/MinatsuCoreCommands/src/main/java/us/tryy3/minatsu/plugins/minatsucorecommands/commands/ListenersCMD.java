@@ -3,9 +3,8 @@ package us.tryy3.minatsu.plugins.minatsucorecommands.commands;
 import us.tryy3.java.minatsu.Bot;
 import us.tryy3.java.minatsu.TCPServer;
 import us.tryy3.java.minatsu.command.Command;
-import us.tryy3.minatsuskype.plugins.minatsupermissions.PermissionsApi;
+import us.tryy3.minatsu.plugins.minatsupermissions.PermissionsApi;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 /**
@@ -15,8 +14,11 @@ public class ListenersCMD extends Command {
     private Bot bot;
     private PermissionsApi perms;
 
-    public ListenersCMD(String name) {
+    public ListenersCMD(String name, Bot bot, PermissionsApi api) {
         super(name);
+
+        this.bot = bot;
+        this.perms = api;
 
         this.setUsage("listener");
         this.setAliases(Collections.singletonList("listeners"));

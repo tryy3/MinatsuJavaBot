@@ -11,22 +11,22 @@ import java.util.List;
     TODO: Support regex in hasPermission
  */
 public class PermissionsApi {
-    Main main;
+    MinatsuPermissions minatsuPermissions;
 
-    public PermissionsApi(Main main) {
-        this.main = main;
+    public PermissionsApi(MinatsuPermissions minatsuPermissions) {
+        this.minatsuPermissions = minatsuPermissions;
     }
 
     /* Groups */
     public boolean addGroupPermission(Group group, String perm) {
         boolean r = group.addPermission(perm);
-        main.getPermissionHandler().saveGroups();
+        minatsuPermissions.getPermissionHandler().saveGroups();
         return r;
     }
 
     public boolean delGroupPermission(Group group, String perm) {
         boolean r = group.delPermission(perm);
-        main.getPermissionHandler().saveGroups();
+        minatsuPermissions.getPermissionHandler().saveGroups();
         return r;
     }
 
@@ -43,10 +43,10 @@ public class PermissionsApi {
     }
 
     public boolean createGroup(String groupName) {
-        if (main.getPermissionHandler().isGroup(groupName)) return false;
+        if (minatsuPermissions.getPermissionHandler().isGroup(groupName)) return false;
 
-        main.getPermissionHandler().addGroup(new Group(groupName, new ArrayList<String>()));
-        main.getPermissionHandler().saveGroups();
+        minatsuPermissions.getPermissionHandler().addGroup(new Group(groupName, new ArrayList<String>()));
+        minatsuPermissions.getPermissionHandler().saveGroups();
         return true;
     }
 
@@ -54,34 +54,35 @@ public class PermissionsApi {
         return deleteGroup(getGroup(group));
     }
     public boolean deleteGroup(Group group) {
-        main.getPermissionHandler().delGroup(group);
-        main.getPermissionHandler().saveGroups();
+        minatsuPermissions.getPermissionHandler().delGroup(group);
+        minatsuPermissions.getPermissionHandler().saveGroups();
         return true;
     }
 
     public boolean isGroup(String groupName) {
-        return main.getPermissionHandler().isGroup(groupName);
+        return minatsuPermissions.getPermissionHandler().isGroup(groupName);
     }
 
     public Group getGroup(String groupname) {
-        return main.getPermissionHandler().getGroup(groupname);
+        return minatsuPermissions.getPermissionHandler().getGroup(groupname);
     }
 
     /* Players */
     public boolean addPlayerPermission(Player player, String perm) {
         boolean r = player.addPermission(perm);
-        main.getPermissionHandler().savePlayers();
+        minatsuPermissions.getPermissionHandler().savePlayers();
         return r;
     }
 
     public boolean delPlayerPermission(Player player, String perm) {
         boolean r = player.delPermission(perm);
-        main.getPermissionHandler().savePlayers();
+        minatsuPermissions.getPermissionHandler().savePlayers();
         return r;
     }
 
     public boolean hasPlayerPermission(String player, String perm) {
-        return getPlayer(player).hasPermission(perm);
+        Player p = getPlayer(player);
+        return (p != null) ? p.hasPermission(perm) : false;
     }
     public boolean hasPlayerPermission(Player player, String perm) {
         return player.hasPermission(perm);
@@ -99,7 +100,7 @@ public class PermissionsApi {
         boolean playerBol = player.addGroup(group);
         boolean groupBol = group.addPlayer(player);
 
-        main.getPermissionHandler().savePlayers();
+        minatsuPermissions.getPermissionHandler().savePlayers();
 
         return (playerBol && groupBol);
     }
@@ -108,7 +109,7 @@ public class PermissionsApi {
         boolean playerBol = player.delGroup(group);
         boolean groupBol = group.delPlayer(player);
 
-        main.getPermissionHandler().savePlayers();
+        minatsuPermissions.getPermissionHandler().savePlayers();
 
         return (playerBol && groupBol);
     }
@@ -118,11 +119,11 @@ public class PermissionsApi {
     }
 
     public Player getPlayer(String player) {
-        return main.getPermissionHandler().getPlayer(player);
+        return minatsuPermissions.getPermissionHandler().getPlayer(player);
     }
 
     /* Misc */
     public List<Group> getGroups() {
-        return main.getPermissionHandler().getGroupList();
+        return minatsuPermissions.getPermissionHandler().getGroupList();
     }
 }

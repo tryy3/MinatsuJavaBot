@@ -6,6 +6,7 @@ import us.tryy3.java.minatsu.command.CommandManager;
 import us.tryy3.java.minatsu.events.Event;
 import us.tryy3.java.minatsu.events.onChatEvent;
 import us.tryy3.java.minatsu.logger.Logger;
+import us.tryy3.java.minatsu.plugins.IPlugin;
 import us.tryy3.java.minatsu.plugins.Plugin;
 import us.tryy3.java.minatsu.plugins.PluginDescription;
 import us.tryy3.java.minatsu.plugins.PluginManager;
@@ -23,7 +24,7 @@ import java.util.*;
 public class Bot {
     private Event event;
     private CommandManager commandManager;
-    private Map<String, Plugin> plugins;
+    private Map<String, IPlugin> plugins;
     private TCPServer tcpServer;
     private Options options;
     private PluginManager pluginManager;
@@ -58,8 +59,6 @@ public class Bot {
         //TODO: Add some sort of dependency system and order system.
 
         loadPlugins(pluginDir);
-
-        this.pluginManager = new PluginManager(plugins);
     }
 
     private void loadPlugins(File file) {
@@ -87,7 +86,9 @@ public class Bot {
 
         this.plugins = new HashMap<>();
 
-       for (Plugin plugin : pluginLoader) {
+        List<Plugin> depend = new ArrayList<>();
+
+        for (Plugin plugin : pluginLoader) {
             plugin.init(this, file);
             PluginDescription desc = plugin.getDescription();
 
@@ -95,16 +96,48 @@ public class Bot {
                 logger.severe("The plugin " + desc.getName() + " already exists.");
             } else {
                 this.plugins.put(desc.getName(), plugin);
-                logger.info("Enabling plugin %s version %s", desc.getName(), desc.getVersion());
-                plugin.onStart();
+                if (desc.getDependency() == null) {
+                    plugin.onStart();
+                } else {
+                    depend.add(plugin);
+                }
             }
+        }
+
+        this.pluginManager = new PluginManager(this.plugins);
+
+        int count = 0;
+
+        while (true) {
+            if (depend.size() == 0) break;
+            if (count >= depend.size()) {
+                count = 0;
+            }
+
+            Plugin plugin = depend.get(count);
+
+            boolean load = true;
+
+            for (String s : plugin.getDescription().getDependency()) {
+                if (!this.plugins.containsKey(s)) load = false;
+            }
+
+            if (load) {
+                plugin.onStart();
+                depend.remove(count);
+            }
+            count++;
         }
     }
 
     private void unloadPlugins() {
-        for (Plugin plugin : plugins.values()) {
+        for (IPlugin plugin : plugins.values()) {
             plugin.onStop();
         }
+    }
+
+    public void unloadPlugin(IPlugin plugin) {
+        this.plugins.remove(plugin.getDescription().getName());
     }
 
     public void reloadPlugins() {
@@ -156,7 +189,7 @@ public class Bot {
 
                     Boolean knownCommand = false;
 
-                    for (Plugin plugin : getPlugins().values()) {
+                    for (IPlugin plugin : getPlugins().values()) {
                         if (plugin.onCommand(connection, from, id, command, args)) {
                             knownCommand = true;
                         }
@@ -195,8 +228,12 @@ public class Bot {
         return event;
     }
 
-    public Map<String, Plugin> getPlugins() {
+    public Map<String, IPlugin> getPlugins() {
         return plugins;
+    }
+
+    public PluginManager getPluginManager() {
+        return pluginManager;
     }
 
     public TCPServer getTcpServer() {

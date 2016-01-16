@@ -35,6 +35,16 @@ var connect = function() {
 	timeout = (timeout <= 60) ? timeout+10 : timeout;
 }
 
+var sendMessage = function(Message) {
+	if (Message.length < 2) {
+        console.log("The arguments is invalid.")
+        console.log('DATA ' + client.remoteAddress + ': ' + Message);
+        return;
+	}
+
+    skyweb.sendMessage(Message[0], Message[1]);
+}
+
 connect();
 
 client.on('error', function() {
@@ -45,7 +55,7 @@ client.on('error', function() {
 client.on("data", function(data) {
 	console.log("Received: " + data);
 	var dataJson = JSON.parse(data.toString());
-	console.log(dataJson);
+
 	if (dataJson.length < 2) {
 		console.log("The data does not have enough arguments.");
 		console.log("DATA " + client.remoteAddress + ": " + data);
@@ -53,13 +63,10 @@ client.on("data", function(data) {
 	}
 
 	if (dataJson[0] == "sendMessage") {
-		if (dataJson[1].length < 2) {
-            console.log("The arguments is invalid.")
-            console.log('DATA ' + sock.remoteAddress + ': ' + data);
-            return;
+		for (var i = 0; i < dataJson[1].length; i++) {
+			sendMessage(dataJson[1][i]);
 		}
 
-        skyweb.sendMessage(dataJson[1][0], dataJson[1][1]);
 	}
 });
 

@@ -146,7 +146,7 @@ public class TCPServer extends Thread {
             return uuid;
         }
 
-        public void sendMessage(String message) {
+        public void sendRaw(String message) {
             out.println(message);
         }
 
@@ -154,6 +154,14 @@ public class TCPServer extends Thread {
             sendMessage(String.format(message, var));
         }
 
+        public void sendMessage(JsonArray messages) {
+            JsonArray obj = new JsonArray();
+
+            obj.add("sendMessage");
+            obj.add(messages);
+
+            sendRaw(obj.toString());
+        }
         public void sendMessage(String id, String message) {
             JsonArray writeArgs = new JsonArray();
             JsonArray msgArgs = new JsonArray();
@@ -164,7 +172,7 @@ public class TCPServer extends Thread {
             writeArgs.add("sendMessage");
             writeArgs.add(msgArgs);
 
-            sendMessage(writeArgs.toString());
+            sendRaw(writeArgs.toString());
         }
 
         public void close() {
